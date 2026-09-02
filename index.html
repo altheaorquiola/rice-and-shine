@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mavies Bugasan — Rice Trading &amp; Inventory</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="screen-area" id="screenArea">
+        <div class="toast" id="toast"></div>
+        <div class="modal-overlay" id="modalOverlay">
+          <div class="modal-sheet" id="modalSheet"></div>
+        </div>
+
+        <!-- ============ CUSTOMER: WELCOME ============ -->
+        <div class="view active" id="view-welcome">
+          <div class="welcome-content">
+            <div class="welcome-logo">
+              <div class="grain">🌾</div>
+              <h1>Mavies Bugasan</h1>
+              <p>
+                at iba pa &nbsp;•&nbsp; Rice Retailer, Quezon City & Marikina
+              </p>
+            </div>
+            <button class="btn btn-sage" onclick="go('view-order-slip')">
+              Order (for Customer)
+            </button>
+            <button class="btn btn-sage" onclick="go('view-track')">
+              Track My Order
+            </button>
+            <button class="btn btn-gray" onclick="go('view-admin-login')">
+              Admin Login
+            </button>
+            <p
+              style="
+                text-align: center;
+                font-size: 11px;
+                color: var(--muted);
+                margin-top: -6px;
+              "
+            >
+              For business owner/staff only.
+            </p>
+          </div>
+          <a
+            href="https://www.facebook.com/profile.php?id=61578261067165"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="welcome-follow">Follow Us On Facebook!</div>
+          </a>
+        </div>
+
+        <!-- ============ CUSTOMER: ORDER SLIP ============ -->
+        <div class="view" id="view-order-slip">
+          <div class="content">
+            <h1 class="page-title">Order Slip</h1>
+            <p class="page-sub">Fill in your details below to place an order</p>
+
+            <div class="field" id="f-name">
+              <label>Full Name</label>
+              <input
+                type="text"
+                id="in-name"
+                placeholder="Ex. Juan Dela Cruz"
+              />
+              <div class="err-msg">Please fill this in.</div>
+            </div>
+            <div class="field" id="f-phone">
+              <label>Phone Number</label>
+              <input type="text" id="in-phone" placeholder="Ex. 09123456789" />
+              <div class="err-msg">Please fill this in.</div>
+            </div>
+            <div class="field" id="f-address">
+              <label>Address (Delivery Location)</label>
+              <textarea
+                id="in-address"
+                rows="2"
+                placeholder="Ex. ABC Building, 123 Street, Barangay Mabuhay, Quezon City"
+              ></textarea>
+              <div class="err-msg">Please fill this in.</div>
+            </div>
+
+            <div class="field-row">
+              <div class="field" id="f-variety">
+                <label>Rice Variety</label>
+                <select
+                  id="in-variety"
+                  onchange="updateOrderSummary()"
+                ></select>
+                <div class="err-msg">Select a variety.</div>
+              </div>
+              <div class="field" id="f-sacks" style="max-width: 120px">
+                <label>Amount in Sacks</label>
+                <div class="qty-stepper">
+                  <button type="button" onclick="stepSacks(-1)">−</button>
+                  <input type="text" id="in-sacks" value="1" readonly />
+                  <button type="button" onclick="stepSacks(1)">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Delivery / Pickup Method</label>
+              <div class="stepper-pills" id="deliveryPills">
+                <button
+                  type="button"
+                  class="selected"
+                  data-val="Pickup"
+                  onclick="selectDelivery(this)"
+                >
+                  Pickup
+                </button>
+                <button
+                  type="button"
+                  data-val="In-house"
+                  onclick="selectDelivery(this)"
+                >
+                  In-house
+                </button>
+                <button
+                  type="button"
+                  data-val="Courier"
+                  onclick="selectDelivery(this)"
+                >
+                  Courier
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Summary</label>
+              <div class="summary-box" id="orderSummary">
+                Fill in the form to see a summary of your order.
+              </div>
+              <p style="font-size: 10.5px; color: var(--muted)">
+                You can submit another slip for various rice types.
+              </p>
+            </div>
+
+            <button class="btn btn-sage" onclick="submitOrder()">Submit</button>
+            <button
+              class="btn btn-outline"
+              style="margin-top: 10px"
+              onclick="go('view-welcome')"
+            >
+              Back to Welcome
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ CUSTOMER: ORDER SUBMITTED ============ -->
+        <div class="view" id="view-order-submitted">
+          <div
+            class="content"
+            style="
+              background: var(--sage);
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              text-align: center;
+            "
+          >
+            <h1 class="page-title" style="color: #1c2a12">Order Submitted!</h1>
+            <p style="font-size: 13px; color: #33421f">Your Order ID is:</p>
+            <div
+              class="order-id-display"
+              id="newOrderIdDisplay"
+              style="color: #1c2a12"
+            >
+              MVB-0000
+            </div>
+            <p style="font-size: 11.5px; color: #33421f; margin-bottom: 26px">
+              Keep this number to track your order later.
+            </p>
+            <button
+              class="btn"
+              style="background: #fff; color: #1c2a12; margin-bottom: 10px"
+              onclick="
+                resetOrderForm();
+                go('view-order-slip');
+              "
+            >
+              Submit Another Order
+            </button>
+            <button class="btn btn-dark" onclick="go('view-track')">
+              Track My Order
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ CUSTOMER: TRACK ORDER ============ -->
+        <div class="view" id="view-track">
+          <div class="content">
+            <h1 class="page-title">Track Order</h1>
+            <p class="page-sub">Enter your order details below</p>
+
+            <div class="field" id="f-track-id">
+              <label>Order ID</label>
+              <input type="text" id="in-track-id" placeholder="Ex. MVB-0001" />
+              <div class="err-msg">We couldn't find that order.</div>
+            </div>
+            <div class="field" id="f-track-phone">
+              <label>Phone Number</label>
+              <input
+                type="text"
+                id="in-track-phone"
+                placeholder="Ex. 09123456789"
+              />
+              <div class="err-msg">Phone number doesn't match.</div>
+            </div>
+            <button class="btn btn-sage" onclick="searchOrder()">
+              Search Order
+            </button>
+
+            <div class="divider"></div>
+            <div class="card-title" style="margin-bottom: 10px">
+              Order Status
+            </div>
+            <div class="card" id="trackResultCard">
+              <div class="kv-row">
+                <span class="k">Order ID:</span
+                ><span class="v" id="tr-id">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="k">Rice Variety:</span
+                ><span class="v" id="tr-variety">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="k">Quantity:</span
+                ><span class="v" id="tr-qty">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="k">Price:</span
+                ><span class="v" id="tr-price">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="k">Status:</span
+                ><span class="v" id="tr-status">—</span>
+              </div>
+            </div>
+            <p
+              style="
+                font-size: 10.5px;
+                color: var(--muted);
+                margin-bottom: 14px;
+              "
+            >
+              You can submit another slip for various rice types.
+            </p>
+            <button
+              class="btn btn-sage"
+              id="printReceiptBtn"
+              onclick="printReceipt()"
+              disabled
+            >
+              Print Receipt
+            </button>
+            <button
+              class="btn btn-outline"
+              style="margin-top: 10px"
+              onclick="go('view-welcome')"
+            >
+              Back to Welcome
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN: LOGIN ============ -->
+        <div class="view" id="view-admin-login">
+          <div
+            class="content"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+            "
+          >
+            <h1 class="page-title">Welcome back, Admin.</h1>
+            <p class="page-sub">Log in to manage orders &amp; inventory</p>
+            <div class="field" id="f-admin-email">
+              <label>Email</label>
+              <input
+                type="text"
+                id="in-admin-email"
+                placeholder="admin.juan@ricetrading.ph"
+                value="admin.juan@ricetrading.ph"
+              />
+              <div class="err-msg" id="err-admin-email">
+                This email is not registered in the system's database.
+              </div>
+            </div>
+            <div class="field" id="f-admin-pass">
+              <label>Password</label>
+              <input
+                type="password"
+                id="in-admin-pass"
+                placeholder="••••••••"
+              />
+              <div class="err-msg" id="err-admin-pass">
+                Incorrect Password. Try Again.
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+              "
+            >
+              <label class="checkbox-row"
+                ><input type="checkbox" checked /> Remember me</label
+              >
+              <button class="link-btn" onclick="openForgotPassword()">
+                Forgot Password?
+              </button>
+            </div>
+            <button class="btn btn-dark" onclick="attemptLogin()">Login</button>
+            <p
+              style="
+                font-size: 10.5px;
+                color: var(--muted);
+                text-align: center;
+                margin-top: 12px;
+              "
+            >
+              Demo password: <strong>ricetrading123</strong>
+            </p>
+            <button
+              class="btn btn-outline"
+              style="margin-top: 16px"
+              onclick="go('view-welcome')"
+            >
+              Back to Welcome
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN: LOCKED ============ -->
+        <div class="view" id="view-locked">
+          <div class="locked-screen">
+            <h2>You have been locked.</h2>
+            <p>
+              Too many incorrect password attempts.<br />You may access the main
+              screen again in:
+            </p>
+            <div class="timer" id="lockTimer">05:00</div>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN: FORGOT PASSWORD - ENTER CODE ============ -->
+        <div class="view" id="view-forgot-code">
+          <div
+            class="content"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+            "
+          >
+            <h1 class="page-title">Enter the Code</h1>
+            <p class="page-sub">Sent to a****n@gmail.com</p>
+            <div class="field" id="f-recovery-code">
+              <label>Recovery Code</label>
+              <input
+                type="text"
+                id="in-recovery-code"
+                placeholder="Recovery Code"
+              />
+              <div class="err-msg">Incorrect Recovery Code!</div>
+            </div>
+            <button
+              class="link-btn"
+              style="margin-bottom: 16px"
+              onclick="resendCode()"
+            >
+              Try Again
+            </button>
+            <button class="btn btn-dark" onclick="verifyRecoveryCode()">
+              Submit
+            </button>
+            <p
+              style="
+                font-size: 10.5px;
+                color: var(--muted);
+                text-align: center;
+                margin-top: 12px;
+              "
+            >
+              Demo code: <strong id="demoCodeHint">12345</strong>
+            </p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN: SET NEW PASSWORD ============ -->
+        <div class="view" id="view-new-password">
+          <div
+            class="content"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+            "
+          >
+            <h1 class="page-title">Enter your new Password</h1>
+            <div class="field" id="f-new-pass">
+              <label>New Password</label>
+              <input type="password" id="in-new-pass" />
+              <div class="err-msg">Password must be at least 6 characters.</div>
+            </div>
+            <div class="field" id="f-confirm-pass">
+              <label>Confirm Password</label>
+              <input type="password" id="in-confirm-pass" />
+              <div class="err-msg">Passwords do not match.</div>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+              "
+            >
+              <label class="checkbox-row"
+                ><input type="checkbox" checked /> Remember me</label
+              >
+              <button class="link-btn" onclick="openForgotPassword()">
+                Forgot Password?
+              </button>
+            </div>
+            <button class="btn btn-sage" onclick="setNewPassword()">
+              Login
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN APP SHELL ============ -->
+        <div class="view" id="view-admin-app" style="min-height: 100%">
+          <div
+            id="adminSubviews"
+            style="
+              flex: 1 1 auto;
+              min-height: 0;
+              display: flex;
+              flex-direction: column;
+              overflow-y: auto;
+            "
+          ></div>
+          <div class="bottom-nav">
+            <button
+              class="nav-btn"
+              data-tab="customers"
+              onclick="switchAdminTab('customers')"
+              title="Customers"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </button>
+            <button
+              class="nav-btn"
+              data-tab="credit"
+              onclick="switchAdminTab('credit')"
+              title="Credit"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="1" y="4" width="22" height="16" rx="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg>
+            </button>
+            <button
+              class="nav-btn active"
+              data-tab="dashboard"
+              onclick="switchAdminTab('dashboard')"
+              title="Dashboard"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+            </button>
+            <button
+              class="nav-btn"
+              data-tab="reports"
+              onclick="switchAdminTab('reports')"
+              title="Reports"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+            </button>
+            <button
+              class="nav-btn"
+              data-tab="settings"
+              onclick="switchAdminTab('settings')"
+              title="Settings"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
